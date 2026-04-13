@@ -37,9 +37,9 @@ def create_app():
         return render_template('landing.html')
 
     return app
+app = create_app()
 
 if __name__ == '__main__':
-    app = create_app()
-    # Debug=True is great for local development. 
+        # Debug=True is great for local development. 
     # For production speed later, we will use a WSGI server like Waitress.
     app.run(debug=True, port=5000)
