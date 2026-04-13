@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Govt Educational Distribution Portal | Official</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        /* --- Fast Buffering & Preloader Animations --- */
+        #preloader {
+            transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+            z-index: 9999;
+        }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(59, 130, 246, 0.2);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Hero Background Blobs (Premium Vibe) --- */
+        .blob {
+            position: absolute; filter: blur(80px); z-index: 0; opacity: 0.6;
+            animation: blob-bounce 10s infinite alternate ease-in-out;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(30, 58, 138, 0.8); }
+        .blob-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: rgba(15, 23, 42, 0.9); animation-delay: 2s; }
+        .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: rgba(59, 130, 246, 0.4); animation-delay: 4s; }
+        
+        @keyframes blob-bounce {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, -50px) scale(1.1); }
+        }
+
+        /* --- Scroll Reveal Animations --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* --- Glassmorphism Utilities --- */
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-dark { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+        /* FAQ Accordion Transition */
+        .faq-answer { transition: max-height 0.3s ease-out, opacity 0.3s ease-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .faq-item.open .faq-answer { max-height: 200px; opacity: 1; }
+        .faq-icon { transition: transform 0.3s ease; }
+        .faq-item.open .faq-icon { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+
+    <div id="preloader" class="fixed inset-0 bg-slate-900 flex flex-col items-center justify-center">
+        <div class="spinner mb-4"></div>
+        <h2 class="text-white text-xl font-bold tracking-widest uppercase animate-pulse">Initializing Portal...</h2>
+        <p class="text-slate-400 text-sm mt-2 font-medium">Establishing secure connection</p>
+    </div>
+
+    <nav class="glass border-b border-slate-200 sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24 items-center">
+                <div class="flex items-center gap-4 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="w-14 h-14 bg-gradient-to-tr from-blue-700 to-blue-500 text-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition duration-300">
+                        <svg class="w-8 h-8 -rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-900 tracking-tight leading-none">Govt Portal</h1>
+                        <p class="text-[11px] text-blue-600 font-bold uppercase tracking-widest mt-1">Dept. of Education</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-slate-600 font-semibold text-sm hover:text-blue-700 transition">Features</a>
+                    <a href="#how-it-works" class="text-slate-600 font-semibold text-sm hover:text-blue-700 transition">Workflow</a>
+                    <a href="#faq" class="text-slate-600 font-semibold text-sm hover:text-blue-700 transition">FAQ</a>
+                    <div class="h-6 w-px bg-slate-300"></div>
+                    <a href="/auth/login" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2">
+                        <span>Secure Access</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-blue-600 focus:outline-none p-2">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full shadow-2xl">
+            <div class="px-4 pt-2 pb-6 space-y-2 flex flex-col">
+                <a href="#features" class="mobile-link block px-4 py-3 text-base font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 rounded-lg">Features</a>
+                <a href="#how-it-works" class="mobile-link block px-4 py-3 text-base font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 rounded-lg">Workflow</a>
+                <a href="#faq" class="mobile-link block px-4 py-3 text-base font-bold text-slate-700 hover:bg-slate-50 hover:text-blue-600 rounded-lg">FAQ</a>
+                <a href="/auth/login" class="block w-full text-center mt-4 bg-blue-600 text-white px-4 py-4 rounded-xl font-bold shadow-lg">Secure Access Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative bg-slate-900 text-white overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-48">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+            
+            <div class="reveal inline-flex items-center gap-2 bg-slate-800/80 border border-slate-700/50 backdrop-blur-md px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest text-blue-300 mb-8 shadow-2xl">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                System Online & Operational
+            </div>
+
+            <h1 class="reveal text-5xl md:text-7xl lg:text-8xl font-black mb-8 leading-[1.1] max-w-5xl tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500">
+                Streamlining Education <br class="hidden md:block"> for Every School.
+            </h1>
+            
+            <p class="reveal text-xl md:text-2xl text-slate-400 mb-12 max-w-3xl font-medium leading-relaxed">
+                A lightning-fast, high-security platform connecting Regional Distributors with over 200+ School Principals for real-time inventory allocation.
+            </p>
+            
+            <div class="reveal flex flex-col sm:flex-row gap-5 w-full sm:w-auto justify-center">
+                <a href="/auth/login" class="group bg-blue-600 hover:bg-blue-500 text-white font-black text-xl px-12 py-5 rounded-2xl shadow-[0_0_40px_rgba(37,99,235,0.4)] transition-all transform hover:-translate-y-1 w-full sm:w-auto text-center flex items-center justify-center gap-3">
+                    Headmaster Login
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <a href="/auth/login" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xl px-12 py-5 rounded-2xl shadow-lg border border-slate-700 transition-all w-full sm:w-auto text-center">
+                    Distributor Access
+                </a>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none">
+            <svg class="relative block w-full h-[50px] lg:h-[100px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M1200 120H0V71.516C73.215 32.553 175.279 2.522 288.665 2.522c153.212 0 241.654 36.636 414.288 36.636 123.633 0 216.711-20.738 316.326-40.852C1087.643-15.42 1162.779 4.382 1200 28.513V120z" class="fill-slate-50"></path>
+            </svg>
+        </div>
+    </header>
+
+    <section class="bg-slate-50 py-10 relative z-20 -mt-10 mb-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-dark rounded-3xl p-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center shadow-2xl transform -translate-y-16">
+                <div class="reveal">
+                    <p class="text-5xl font-black text-white mb-2"><span class="counter" data-target="200">0</span>+</p>
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-sm">Active Schools</p>
+                </div>
+                <div class="reveal md:border-l md:border-r border-slate-700">
+                    <p class="text-5xl font-black text-white mb-2"><span class="counter" data-target="50000">0</span></p>
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-sm">Items Distributed</p>
+                </div>
+                <div class="reveal">
+                    <p class="text-5xl font-black text-white mb-2"><span class="counter" data-target="100">0</span>%</p>
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-sm">Digital Record Accuracy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+                <h2 class="text-blue-600 font-black uppercase tracking-widest text-sm mb-3">Enterprise Grade</h2>
+                <h3 class="text-4xl md:text-5xl font-black text-slate-900 mb-6">Engineered for Efficiency</h3>
+                <p class="text-xl text-slate-600 font-medium leading-relaxed">Built from the ground up to eliminate paperwork, reduce wait times, and guarantee equitable distribution of government resources.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div class="bg-white rounded-3xl p-10 shadow-lg border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 reveal group">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-slate-900 mb-4">Lightning Fast SPA</h4>
+                    <p class="text-slate-600 leading-relaxed">Powered by Vanilla JS and Fetch APIs to ensure older systems and low-bandwidth connections experience zero page reloads.</p>
+                </div>
+                <div class="bg-white rounded-3xl p-10 shadow-lg border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 reveal group" style="transition-delay: 100ms;">
+                    <div class="w-16 h-16 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-green-600 group-hover:text-white transition-all">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-slate-900 mb-4">Foolproof Security</h4>
+                    <p class="text-slate-600 leading-relaxed">Pre-provisioned accounts with forced password changes upon first login. Zero email verifications required for maximum access.</p>
+                </div>
+                <div class="bg-white rounded-3xl p-10 shadow-lg border border-slate-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 reveal group" style="transition-delay: 200ms;">
+                    <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h4 class="text-2xl font-bold text-slate-900 mb-4">Instant PDF Audits</h4>
+                    <p class="text-slate-600 leading-relaxed">Distributors can generate master inventory reports for Government audits in under a second directly from their browser.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="py-24 bg-white border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20 reveal">
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900">Simple 3-Step Process</h2>
+                <p class="text-xl text-slate-500 mt-4 font-medium">Designed specifically for Headmasters to request stock effortlessly without tech anxiety.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14">
+                <div class="bg-slate-50 rounded-3xl p-10 relative text-center transition-all duration-300 hover:shadow-xl reveal border border-transparent hover:border-slate-200">
+                    <div class="w-20 h-20 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-8 shadow-lg absolute -top-10 left-1/2 -translate-x-1/2">1</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 mt-6">Login with ID</h3>
+                    <p class="text-slate-600 leading-relaxed font-medium">Use your U-DISE or official School ID. Your account is pre-provisioned. Just log in and set a private password.</p>
+                </div>
+                
+                <div class="bg-slate-50 rounded-3xl p-10 relative text-center transition-all duration-300 hover:shadow-xl reveal border border-transparent hover:border-slate-200" style="transition-delay: 150ms;">
+                    <div class="w-20 h-20 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-8 shadow-lg absolute -top-10 left-1/2 -translate-x-1/2">2</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 mt-6">Select Inventory</h3>
+                    <p class="text-slate-600 leading-relaxed font-medium">Browse the available Government allocations (Laptops, Uniforms, Books) uploaded by the Distributor.</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl p-10 relative text-center transition-all duration-300 hover:shadow-xl reveal border border-transparent hover:border-slate-200" style="transition-delay: 300ms;">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-8 shadow-[0_0_20px_rgba(37,99,235,0.5)] absolute -top-10 left-1/2 -translate-x-1/2">3</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 mt-6">Submit Strength</h3>
+                    <p class="text-slate-600 leading-relaxed font-medium">Enter the quantity required based on your student strength. Approvals are pushed to your dashboard instantly.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="py-24 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900">Frequently Asked Questions</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden reveal cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="p-6 flex justify-between items-center">
+                        <h4 class="text-lg font-bold text-slate-800">What do I do if I forget my password?</h4>
+                        <svg class="w-6 h-6 text-blue-600 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div class="faq-answer bg-slate-50 px-6">
+                        <p class="pb-6 text-slate-600">Contact your Regional Distributor. They have a "1-Click Reset" button on their dashboard that will instantly reset your password to the default format, allowing you to log back in immediately.</p>
+                    </div>
+                </div>
+                <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden reveal cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="p-6 flex justify-between items-center">
+                        <h4 class="text-lg font-bold text-slate-800">Do I need to create an account?</h4>
+                        <svg class="w-6 h-6 text-blue-600 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div class="faq-answer bg-slate-50 px-6">
+                        <p class="pb-6 text-slate-600">No. All 200+ school accounts have been pre-provisioned by the Government using your official School ID to ensure maximum security and ease of access.</p>
+                    </div>
+                </div>
+                <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden reveal cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="p-6 flex justify-between items-center">
+                        <h4 class="text-lg font-bold text-slate-800">Can I request more items than the stock available?</h4>
+                        <svg class="w-6 h-6 text-blue-600 faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                    <div class="faq-answer bg-slate-50 px-6">
+                        <p class="pb-6 text-slate-600">Yes, you submit your actual requirement. If the stock is lower than your requirement, the Distributor has the authority to partially fulfill your request based on current availability.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-blue-600 relative overflow-hidden py-20">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-blue-500 opacity-50 blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-blue-700 opacity-50 blur-3xl"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10 reveal">
+            <h2 class="text-4xl font-black text-white mb-6">Ready to request your materials?</h2>
+            <p class="text-xl text-blue-100 mb-10">Access your school's dashboard now to secure inventory for the upcoming academic session.</p>
+            <a href="/auth/login" class="inline-block bg-white text-blue-700 font-black text-2xl px-12 py-5 rounded-2xl shadow-2xl hover:bg-slate-50 hover:scale-105 transition-all duration-300">
+                Log In to Portal
+            </a>
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-slate-400 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-slate-800 text-slate-300 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg>
+                        </div>
+                        <p class="text-2xl font-black text-white tracking-wide">Govt Portal</p>
+                    </div>
+                    <p class="text-slate-500 max-w-sm">The official unified platform for educational material distribution and inventory management.</p>
+                </div>
+                <div class="flex md:justify-end items-center gap-8 text-sm font-bold">
+                    <a href="#" class="hover:text-blue-400 transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-blue-400 transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-blue-400 transition-colors">Help Center</a>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-sm font-medium">&copy; 2026 Department of Education. All rights reserved.</p>
+                
+                <div class="bg-slate-800/80 px-6 py-3 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors">
+                    <p class="text-sm text-slate-300 flex items-center gap-2">
+                        <span>Architected & Developed by</span>
+                        <a href="https://deva3019.netlify.app" target="_blank" rel="noopener noreferrer" class="group relative font-bold text-white flex items-center gap-1">
+                            <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 group-hover:from-emerald-400 group-hover:to-blue-400 transition-all duration-500">Deva Veera Kumaran</span>
+                            <svg class="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Remove Preloader on Load
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            // Adding a tiny delay to ensure the smooth buffering effect is seen
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+            }, 600);
+        });
+
+        // 2. Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // 3. Scroll Reveal Animations (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Trigger only once
+                }
+            });
+        }, {
+            root: null,
+            threshold: 0.15, // Trigger when 15% visible
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // 4. Animated Number Counters
+        const counters = document.querySelectorAll('.counter');
+        let hasCounted = false;
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !hasCounted) {
+                    hasCounted = true;
+                    counters.forEach(counter => {
+                        const target = +counter.getAttribute('data-target');
+                        const duration = 2000; // 2 seconds
+                        const increment = target / (duration / 16); // 60fps
+                        
+                        let current = 0;
+                        const updateCounter = () => {
+                            current += increment;
+                            if (current < target) {
+                                counter.innerText = Math.ceil(current).toLocaleString();
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                counter.innerText = target.toLocaleString();
+                            }
+                        };
+                        updateCounter();
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // Observe the stats section parent
+        const statsSection = document.querySelector('.glass-dark');
+        if(statsSection) counterObserver.observe(statsSection);
+
+        // 5. FAQ Accordion Logic
+        function toggleFaq(element) {
+            // Close others
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if(item !== element) item.classList.remove('open');
+            });
+            // Toggle current
+            element.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

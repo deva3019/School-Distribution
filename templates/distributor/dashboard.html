@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributor Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* Scrollbar styling for tables */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans h-screen flex overflow-hidden">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <aside class="w-64 bg-slate-900 text-white flex flex-col h-full shadow-2xl z-20">
+        <div class="p-6 border-b border-slate-800">
+            <h2 class="text-2xl font-bold text-blue-400">Govt Portal</h2>
+            <p class="text-xs text-slate-400 mt-1">Distributor Command Center</p>
+        </div>
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-lg transition font-medium">
+                📊 Overview
+            </button>
+            <button onclick="switchTab('requests')" id="nav-requests" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition font-medium">
+                📥 Manage Requests
+            </button>
+            <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition font-medium">
+                📦 Inventory
+            </button>
+            <button onclick="switchTab('schools')" id="nav-schools" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition font-medium">
+                🏫 School Accounts
+            </button>
+            <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition font-medium">
+                📄 Export Reports
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-800">
+            <a href="/auth/logout" class="w-full block text-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition">Logout</a>
+        </div>
+    </aside>
+
+    <main class="flex-1 h-full overflow-y-auto p-8 relative">
+
+        <section id="tab-overview" class="tab-content active">
+            <h1 class="text-3xl font-bold text-slate-800 mb-8">System Analytics</h1>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-blue-500">
+                    <p class="text-sm font-semibold text-slate-500 uppercase">Pending Requests</p>
+                    <p id="stat-pending" class="text-4xl font-black text-slate-800 mt-2">--</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-green-500">
+                    <p class="text-sm font-semibold text-slate-500 uppercase">Items Dispatched</p>
+                    <p id="stat-approved" class="text-4xl font-black text-slate-800 mt-2">--</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-purple-500">
+                    <p class="text-sm font-semibold text-slate-500 uppercase">Schools Registered</p>
+                    <p id="stat-schools" class="text-4xl font-black text-slate-800 mt-2">--</p>
+                </div>
+            </div>
+            <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-blue-900">Action Required</h3>
+                    <p class="text-blue-700">You have pending requests from school principals waiting for approval.</p>
+                </div>
+                <button onclick="switchTab('requests')" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 font-bold">Review Now</button>
+            </div>
+        </section>
+
+        <section id="tab-requests" class="tab-content">
+            <h1 class="text-3xl font-bold text-slate-800 mb-6">Pending Operations</h1>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-100 border-b border-slate-200">
+                        <tr>
+                            <th class="p-4 font-semibold text-slate-600">School</th>
+                            <th class="p-4 font-semibold text-slate-600">Item Requested</th>
+                            <th class="p-4 font-semibold text-slate-600">Qty Needed</th>
+                            <th class="p-4 font-semibold text-slate-600">Current Stock</th>
+                            <th class="p-4 font-semibold text-slate-600">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-tbody" class="divide-y divide-slate-100">
+                        <tr><td colspan="5" class="p-8 text-center text-slate-400">Loading requests...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-inventory" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-slate-800">Govt Inventory</h1>
+                <button onclick="document.getElementById('inventory-form').classList.toggle('hidden')" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 font-bold flex items-center gap-2">
+                    + Add New Shipment
+                </button>
+            </div>
+
+            <form id="inventory-form" class="hidden bg-white p-6 rounded-xl shadow-md border border-slate-200 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Item Name</label>
+                    <input type="text" id="inv-name" required class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Category</label>
+                    <select id="inv-cat" class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="Textbooks">Textbooks</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Uniforms">Uniforms</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 mb-1">Total Quantity</label>
+                    <input type="number" id="inv-qty" required class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <button type="submit" class="bg-blue-600 text-white p-2 rounded shadow hover:bg-blue-700 font-bold h-[42px]">Save Item</button>
+            </form>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-100 border-b border-slate-200">
+                        <tr>
+                            <th class="p-4 font-semibold text-slate-600">Item</th>
+                            <th class="p-4 font-semibold text-slate-600">Category</th>
+                            <th class="p-4 font-semibold text-slate-600">Total Allocated</th>
+                            <th class="p-4 font-semibold text-slate-600">Remaining Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-tbody" class="divide-y divide-slate-100">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-schools" class="tab-content">
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">School Account Manager</h1>
+            <p class="text-slate-500 mb-6">Reset HM passwords instantly without email verification.</p>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-100 border-b border-slate-200">
+                        <tr>
+                            <th class="p-4 font-semibold text-slate-600">School ID</th>
+                            <th class="p-4 font-semibold text-slate-600">School Name</th>
+                            <th class="p-4 font-semibold text-slate-600">Status</th>
+                            <th class="p-4 font-semibold text-slate-600 text-right">Security</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schools-tbody" class="divide-y divide-slate-100">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="tab-reports" class="tab-content">
+            <h1 class="text-3xl font-bold text-slate-800 mb-6">Government Audit Export</h1>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center">
+                <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full mx-auto flex items-center justify-center mb-4">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">Generate Master PDF</h2>
+                <p class="text-slate-500 mt-2 mb-6 max-w-md mx-auto">Click below to generate a real-time snapshot of current inventory levels and fulfilled requests for official record keeping.</p>
+                <button onclick="generatePDF()" class="bg-red-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-red-700 font-bold text-lg transition flex items-center gap-2 mx-auto">
+                    Download Official Record
+                </button>
+            </div>
+            
+            <div id="pdf-content" class="hidden p-10 bg-white">
+                <h1 class="text-3xl font-bold mb-2">Distribution Master Report</h1>
+                <p class="text-gray-500 mb-8" id="pdf-date"></p>
+                <h2 class="text-xl font-bold mb-4 border-b pb-2">Current Inventory Status</h2>
+                <table class="w-full text-left mb-8 border border-gray-300">
+                    <thead class="bg-gray-100"><tr id="pdf-inv-head"></tr></thead>
+                    <tbody id="pdf-inv-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- 1. UI Utilities ---
+        function showToast(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `px-6 py-3 rounded shadow-lg font-bold text-white transition-all transform duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            t.textContent = msg;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-slate-300', 'hover:bg-slate-800');
+            });
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.classList.remove('text-slate-300', 'hover:bg-slate-800');
+            activeBtn.classList.add('bg-blue-600', 'text-white');
+
+            // Load data when tab opens
+            if(tabId === 'overview') loadStats();
+            if(tabId === 'requests') loadRequests();
+            if(tabId === 'inventory') loadInventory();
+            if(tabId === 'schools') loadSchools();
+        }
+
+        // --- 2. Data Fetching (AJAX) ---
+        async function loadStats() {
+            try {
+                const res = await fetch('/distributor/api/stats');
+                const data = await res.json();
+                if(data.status === 'success') {
+                    document.getElementById('stat-pending').innerText = data.data.pending_requests;
+                    document.getElementById('stat-approved').innerText = data.data.approved_requests;
+                    document.getElementById('stat-schools').innerText = data.data.total_schools;
+                }
+            } catch (e) { console.error("Error loading stats", e); }
+        }
+
+        async function loadInventory() {
+            const res = await fetch('/distributor/api/inventory');
+            const data = await res.json();
+            const tbody = document.getElementById('inventory-tbody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(item => {
+                const isLow = item.remaining_balance < (item.total_allocated * 0.1); // Under 10%
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-4 font-semibold ${isLow ? 'text-red-600' : 'text-slate-800'}">${item.item_name} ${isLow ? '⚠️' : ''}</td>
+                        <td class="p-4 text-slate-600">${item.category}</td>
+                        <td class="p-4 text-slate-600">${item.total_allocated}</td>
+                        <td class="p-4 font-bold ${isLow ? 'text-red-600' : 'text-green-600'}">${item.remaining_balance}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function loadRequests() {
+            const res = await fetch('/distributor/api/requests');
+            const data = await res.json();
+            const tbody = document.getElementById('requests-tbody');
+            
+            if(data.data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No pending requests right now.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.data.forEach(req => {
+                const safeStock = req.stock_available >= req.requested_qty;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-bold text-slate-800">${req.school_name}</td>
+                        <td class="p-4 text-slate-600">${req.item_name}</td>
+                        <td class="p-4 font-bold text-blue-600">${req.requested_qty}</td>
+                        <td class="p-4 font-bold ${safeStock ? 'text-green-600' : 'text-red-500'}">${req.stock_available}</td>
+                        <td class="p-4 flex gap-2">
+                            <button onclick="handleRequest('${req.request_id}', 'approve', ${req.requested_qty})" class="bg-green-500 text-white px-3 py-1 rounded shadow hover:bg-green-600 text-sm font-bold">Approve</button>
+                            <button onclick="handleRequest('${req.request_id}', 'reject', 0)" class="bg-red-500 text-white px-3 py-1 rounded shadow hover:bg-red-600 text-sm font-bold">Reject</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function loadSchools() {
+            const res = await fetch('/distributor/api/schools');
+            const data = await res.json();
+            const tbody = document.getElementById('schools-tbody');
+            tbody.innerHTML = '';
+            
+            data.data.forEach(school => {
+                const status = school.needs_password_change 
+                    ? '<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-bold">Needs Setup</span>'
+                    : '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">Active</span>';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-4 font-mono text-slate-500">${school.username}</td>
+                        <td class="p-4 font-bold text-slate-800">${school.school_name || 'Govt School'}</td>
+                        <td class="p-4">${status}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="resetPassword('${school._id}')" class="text-red-500 hover:text-red-700 font-bold text-sm bg-red-50 px-3 py-1 rounded border border-red-200 transition">Reset Password</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- 3. Form Submissions & Actions ---
+        document.getElementById('inventory-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                item_name: document.getElementById('inv-name').value,
+                category: document.getElementById('inv-cat').value,
+                quantity: document.getElementById('inv-qty').value
+            };
+            
+            const res = await fetch('/distributor/api/inventory', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                showToast(data.message);
+                e.target.reset();
+                e.target.classList.add('hidden');
+                loadInventory();
+            }
+        });
+
+        async function handleRequest(reqId, action, qty) {
+            const payload = { request_id: reqId, action: action, approved_qty: qty };
+            if(action === 'reject') { payload.reason = "Stock unavailable or invalid request."; }
+
+            const res = await fetch('/distributor/api/requests/action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            
+            if(data.status === 'success') {
+                showToast(data.message);
+                loadRequests(); // Refresh table
+                loadStats();    // Refresh sidebar stats
+            } else {
+                showToast(data.message, 'error');
+            }
+        }
+
+        async function resetPassword(schoolId) {
+            if(!confirm("Are you sure you want to reset this school's password?")) return;
+            
+            const res = await fetch('/distributor/api/schools/reset-password', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ school_id: schoolId })
+            });
+            const data = await res.json();
+            if(data.status === 'success') {
+                showToast(data.message);
+                loadSchools();
+            }
+        }
+
+        // --- 4. HTML2PDF Generation ---
+        async function generatePDF() {
+            // First, make sure we have fresh inventory data
+            const res = await fetch('/distributor/api/inventory');
+            const data = await res.json();
+            
+            const pdfDiv = document.getElementById('pdf-content');
+            document.getElementById('pdf-date').innerText = "Generated on: " + new Date().toLocaleString();
+            
+            const tbody = document.getElementById('pdf-inv-body');
+            tbody.innerHTML = '';
+            document.getElementById('pdf-inv-head').innerHTML = '<th class="p-2">Item Name</th><th class="p-2">Allocated</th><th class="p-2">Remaining</th>';
+            
+            data.data.forEach(item => {
+                tbody.innerHTML += `<tr><td class="p-2 border-b border-gray-200">${item.item_name}</td><td class="p-2 border-b border-gray-200">${item.total_allocated}</td><td class="p-2 border-b border-gray-200 font-bold">${item.remaining_balance}</td></tr>`;
+            });
+
+            // Temporarily show the div, generate PDF, then hide it
+            pdfDiv.style.display = 'block';
+            
+            const opt = {
+                margin: 1,
+                filename: 'Govt_Distribution_Report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            await html2pdf().set(opt).from(pdfDiv).save();
+            pdfDiv.style.display = 'none';
+            showToast('PDF Report Generated Successfully!');
+        }
+
+        // Init App
+        window.onload = () => loadStats();
+    </script>
+</body>
+</html>

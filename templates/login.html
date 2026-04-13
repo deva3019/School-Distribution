@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth transitions for hiding/showing elements */
+        .fade-enter { opacity: 0; transform: translateY(10px); transition: all 0.4s ease-out; }
+        .fade-enter-active { opacity: 1; transform: translateY(0); }
+        .hidden-state { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-200 relative overflow-hidden">
+        
+        <div id="login-section" class="fade-enter fade-enter-active">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Govt Distribution</h1>
+                <p class="text-slate-500 mt-1">Enter your credentials to access the portal</p>
+            </div>
+
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">School ID / Username</label>
+                    <input type="text" id="username" required 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition uppercase font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                    <input type="password" id="password" required 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition font-medium">
+                </div>
+                <button type="submit" id="login-btn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-md transition duration-200 flex justify-center items-center">
+                    <span>Sign In</span>
+                </button>
+            </form>
+        </div>
+
+        <div id="reset-section" class="hidden-state fade-enter">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-amber-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-800">Update Required</h1>
+                <p class="text-slate-500 mt-1">Please secure your account with a new password.</p>
+            </div>
+
+            <form id="reset-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">New Password</label>
+                    <input type="password" id="new-password" required minlength="6"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Confirm Password</label>
+                    <input type="password" id="confirm-password" required minlength="6"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition font-medium">
+                </div>
+                <button type="submit" id="reset-btn"
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg shadow-md transition duration-200">
+                    Secure Account & Continue
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        // --- UI Helpers ---
+        function showToast(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white';
+            
+            toast.className = `px-6 py-3 rounded-lg shadow-lg font-semibold ${colors} transform transition-all duration-300 translate-y-[-20px] opacity-0`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-[-20px]', 'opacity-0');
+            }, 10);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function switchLayoutToReset() {
+            const loginSec = document.getElementById('login-section');
+            const resetSec = document.getElementById('reset-section');
+            
+            loginSec.classList.add('hidden-state');
+            resetSec.classList.remove('hidden-state');
+            
+            // Trigger animation
+            setTimeout(() => {
+                resetSec.classList.add('fade-enter-active');
+            }, 50);
+        }
+
+        function setLoading(btnId, isLoading, defaultText) {
+            const btn = document.getElementById(btnId);
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = defaultText;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        // --- Fetch API: Login Flow ---
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading('login-btn', true, 'Sign In');
+
+            const payload = {
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('/auth/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    window.location.href = data.redirect_url;
+                } else if (data.status === 'require_password_change') {
+                    switchLayoutToReset();
+                    showToast(data.message, 'error'); // Using error color just to grab attention
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                showToast("Network error. Please try again.", 'error');
+            } finally {
+                setLoading('login-btn', false, 'Sign In');
+            }
+        });
+
+        // --- Fetch API: Password Reset Flow ---
+        document.getElementById('reset-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newPass = document.getElementById('new-password').value;
+            const confPass = document.getElementById('confirm-password').value;
+
+            if (newPass !== confPass) {
+                showToast("Passwords do not match!", 'error');
+                return;
+            }
+
+            setLoading('reset-btn', true, 'Secure Account & Continue');
+
+            try {
+                const response = await fetch('/auth/api/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ new_password: newPass })
+                });
+                
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showToast(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1000);
+                } else {
+                    showToast(data.message, 'error');
+                    setLoading('reset-btn', false, 'Secure Account & Continue');
+                }
+            } catch (error) {
+                showToast("Network error. Please try again.", 'error');
+                setLoading('reset-btn', false, 'Secure Account & Continue');
+            }
+        });
+    </script>
+</body>
+</html>
